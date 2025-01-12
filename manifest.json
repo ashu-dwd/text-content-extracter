@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Div Text Accessor",
+  "version": "1.0",
+  "description": "Access and display the text of a specific div.",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Click to check div content"
+  }
+}
