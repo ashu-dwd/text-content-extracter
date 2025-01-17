@@ -8,36 +8,49 @@
       :root {
         --primary-color: #2563eb;
         --primary-hover: #1d4ed8;
+        --success-color: #10b981;
+        --error-color: #ef4444;
         --bg-color: #f8fafc;
         --text-color: #1e293b;
         --border-color: #e2e8f0;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
       body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-        margin: 0;
-        padding: 16px;
-        min-width: 350px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
         background-color: var(--bg-color);
         color: var(--text-color);
+        min-width: 400px;
+        max-width: 600px;
+        margin: 0;
+        padding: 16px;
+        line-height: 1.5;
       }
 
       .container {
-        max-width: 600px;
-        margin: 0 auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px var(--shadow-color);
+        overflow: hidden;
       }
 
       .header {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--border-color);
+        background-color: white;
       }
 
-      h3 {
-        margin: 0;
+      .title {
         font-size: 18px;
         font-weight: 600;
         color: var(--text-color);
@@ -55,10 +68,15 @@
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         gap: 6px;
+        transition: all 0.2s ease;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
 
       .primary-button {
@@ -66,7 +84,7 @@
         color: white;
       }
 
-      .primary-button:hover {
+      .primary-button:hover:not(:disabled) {
         background-color: var(--primary-hover);
       }
 
@@ -76,37 +94,68 @@
         border: 1px solid var(--border-color);
       }
 
-      .secondary-button:hover {
+      .secondary-button:hover:not(:disabled) {
         background-color: var(--bg-color);
       }
 
-      #content {
-        margin-top: 16px;
+      .content-area {
         padding: 16px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background-color: white;
-        font-size: 14px;
-        line-height: 1.6;
+        min-height: 200px;
         max-height: 400px;
         overflow-y: auto;
+      }
+
+      #content {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-color);
+        white-space: pre-wrap;
       }
 
       .loading {
         display: none;
         text-align: center;
-        padding: 20px;
-        color: var(--text-color);
+        padding: 40px 20px;
       }
 
       .spinner {
-        width: 24px;
-        height: 24px;
-        border: 3px solid var(--border-color);
-        border-top: 3px solid var(--primary-color);
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-color);
+        border-top: 4px solid var(--primary-color);
         border-radius: 50%;
+        margin: 0 auto 16px;
         animation: spin 1s linear infinite;
-        margin: 0 auto 12px;
+      }
+
+      .loading-text {
+        font-size: 14px;
+        color: var(--text-color);
+        margin-top: 12px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        padding: 12px 24px;
+        border-radius: 6px;
+        background-color: var(--success-color);
+        color: white;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px var(--shadow-color);
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.error {
+        background-color: var(--error-color);
       }
 
       @keyframes spin {
@@ -118,30 +167,35 @@
         }
       }
 
-      .toast {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 24px;
-        background-color: #10b981;
-        color: white;
-        border-radius: 6px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        font-size: 14px;
+      /* Scrollbar Styling */
+      ::-webkit-scrollbar {
+        width: 8px;
       }
 
-      .toast.show {
-        opacity: 1;
+      ::-webkit-scrollbar-track {
+        background: var(--bg-color);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h3>Content Summarizer</h3>
+        <div class="title">Content Summarizer</div>
         <div class="button-group">
-          <button id="copy-content" class="secondary-button">
+          <button
+            id="copy-content"
+            class="secondary-button"
+            title="Copy to clipboard"
+          >
             <svg
               width="16"
               height="16"
@@ -157,7 +211,11 @@
             </svg>
             Copy
           </button>
-          <button id="fetch-content" class="primary-button">
+          <button
+            id="fetch-content"
+            class="primary-button"
+            title="Generate summary"
+          >
             <svg
               width="16"
               height="16"
@@ -171,22 +229,23 @@
               ></path>
               <path d="M21 3v5h-5"></path>
             </svg>
-            Fetch & Summarize
+            Summarize
           </button>
         </div>
       </div>
 
       <div class="loading" id="loading">
         <div class="spinner"></div>
-        <p>Generating summary...</p>
+        <div class="loading-text">Generating summary...</div>
       </div>
 
-      <div id="content">
-        Click 'Fetch & Summarize' to generate content summary...
+      <div class="content-area">
+        <div id="content">Click 'Summarize' to generate content summary...</div>
       </div>
     </div>
 
-    <div class="toast" id="toast">Copied to clipboard!</div>
+    <div id="toast" class="toast">Copied to clipboard!</div>
+
     <script src="popup.js"></script>
   </body>
 </html>
